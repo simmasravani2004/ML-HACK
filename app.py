@@ -38,32 +38,41 @@ plt.title("COVID-19 Data for USA")
 plt.show()
 
 import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVR  # Import SVR for Support Vector Regression
 
 # Generate random historical data
 np.random.seed(42)
 historical_cases = np.random.randint(30000, 70000, size=30)  # Last 30 days cases
 historical_deaths = np.random.randint(500, 2000, size=30)
 
+# Create a DataFrame
 df_historical = pd.DataFrame({"cases": historical_cases, "deaths": historical_deaths})
 df_historical["day"] = range(1, 31)
 
 print(df_historical.head())
 
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-
+# Prepare the features and target variable
 X = df_historical[["day"]]
 y = df_historical["cases"]
 
+# Split data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-model = LinearRegression()
-model.fit(X_train, y_train)
+# Initialize the Support Vector Regression model
+svr_model = SVR(kernel='rbf')  # Radial Basis Function (RBF) kernel, you can experiment with others
 
-# Predict next day's cases
+# Fit the model to the training data
+svr_model.fit(X_train, y_train)
+
+# Predict next day's cases (Day 31)
 next_day = np.array([[31]])
-predicted_cases = model.predict(next_day)
-print(f"Predicted cases for Day 31: {int(predicted_cases[0])}")
+predicted_cases = svr_model.predict(next_day)
+
+# Print the predicted cases
+print(f"Predicted cases for Day 31 using SVR: {int(predicted_cases[0])}")
+
 
 import streamlit as st
 
